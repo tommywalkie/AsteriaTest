@@ -3,8 +3,8 @@ import { Edge, MarkerType, Position } from '@xyflow/react'
 import { AsteriaNode, Project } from '../models'
 
 export const PROJECT_COLUMN = 0
-export const TECHNICAL_CHALLENGE_COLUMN = 200
-export const BIOLOGICAL_MODEL_COLUMN = 400
+export const TECHNICAL_CHALLENGE_COLUMN = 500
+export const BIOLOGICAL_MODEL_COLUMN = 1000
 export const MODEL_SPACING = 120
 
 /**

@@ -26,6 +26,12 @@ pnpm dev
 pnpm test
 ```
 
+## Typecheck
+
+```bash
+pnpm typecheck
+```
+
 ## Build
 
 ```bash

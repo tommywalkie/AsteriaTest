@@ -4,6 +4,15 @@ import { useProjectFlow } from './hooks/useProjectFlow'
 import { useEffect } from 'react'
 import { AsteriaNode } from './models'
 import { useProject } from './hooks/useProject'
+import ProjectNode from './components/ProjectNode'
+import BiologicalModelNode from './components/BiologicalModelNode'
+import TechnicalChallengeNode from './components/TechnicalChallengeNode'
+
+const nodeTypes = {
+  project: ProjectNode,
+  biologicalModel: BiologicalModelNode,
+  technicalChallenge: TechnicalChallengeNode,
+}
 
 export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState<AsteriaNode>([])
@@ -27,7 +36,14 @@ export default function App() {
 
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
-      <ReactFlow nodes={nodes} edges={edges} fitView onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        nodeTypes={nodeTypes}
+        fitView
+      >
         <Background />
         <Controls />
       </ReactFlow>
