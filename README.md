@@ -4,6 +4,8 @@ Technical test intended to showcase projects, their technical challenges and the
 
 Powered by Vite, React, Tailwind CSS and [React Flow](https://reactflow.dev/).
 
+Temporarily hosted on https://asteria-test.tommywalkie.com/.
+
 ## Requirements
 
 - Node.js 18+

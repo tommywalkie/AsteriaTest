@@ -1,4 +1,4 @@
-import { ReactFlow, Background, Controls, useNodesState, useEdgesState, Edge, ReactFlowProvider } from '@xyflow/react'
+import { ReactFlow, Background, Controls, useNodesState, useEdgesState, Edge } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useProjectFlow } from './hooks/useProjectFlow'
 import { useEffect } from 'react'
