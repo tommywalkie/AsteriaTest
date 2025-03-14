@@ -2,7 +2,7 @@ import { memo } from 'react'
 import { Handle, NodeProps, Position } from '@xyflow/react'
 import { AsteriaNode } from 'src/models'
 
-const BiologicalModelNode = memo<NodeProps<AsteriaNode>>(({ data }) => {
+const BiologicalModelNode = memo<NodeProps<AsteriaNode<'biologicalModel'>>>(({ data }) => {
   return (
     <>
       <Handle type="target" position={Position.Left} className="opacity-0" />

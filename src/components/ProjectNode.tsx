@@ -2,7 +2,7 @@ import { memo } from 'react'
 import { Handle, NodeProps, Position } from '@xyflow/react'
 import { AsteriaNode } from 'src/models'
 
-const ProjectNode = memo<NodeProps<AsteriaNode>>(({ data }) => {
+const ProjectNode = memo<NodeProps<AsteriaNode<'project'>>>(({ data }) => {
   return (
     <>
       <div className="w-100 max-w-100 max-h-40 line-clamp-3 px-3 py-2 bg-cyan-100 rounded-md border border-cyan-200 text-center relative">

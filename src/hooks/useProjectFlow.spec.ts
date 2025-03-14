@@ -6,7 +6,7 @@ import {
   BIOLOGICAL_MODEL_COLUMN,
   MODEL_SPACING,
 } from './useProjectFlow'
-import { Project } from '../models'
+import { AddBiologicalModelData, Project } from '../models'
 import { Position, MarkerType, EdgeMarker } from '@xyflow/react'
 import { describe, it, expect } from 'vitest'
 
@@ -54,9 +54,8 @@ describe('useProjectFlow', () => {
     const { result } = renderHook(() => useProjectFlow(testProject))
     const [nodes, edges] = result.current
 
-    // Check total number of nodes and edges
-    expect(nodes.length).toBe(6) // 1 project + 2 challenges + 3 models
-    expect(edges.length).toBe(5) // 2 project->challenge + 3 challenge->model
+    expect(nodes.length).toBe(8) // 1 project + 2 challenges + 3 models + 2 add nodes
+    expect(edges.length).toBe(7) // 2 project->challenge + 3 challenge->model + 2 challenge->add
   })
 
   it('should create a project node with correct properties', () => {
@@ -125,15 +124,21 @@ describe('useProjectFlow', () => {
     const { result } = renderHook(() => useProjectFlow(testProject))
     const [, edges] = result.current
 
-    const firstChallengeEdges = edges.filter((edge) => edge.source === testProject.technicalChallenges[0].id.toString())
-
-    expect(firstChallengeEdges.length).toBe(2) // First challenge has 2 models
-
-    const secondChallengeEdges = edges.filter(
-      (edge) => edge.source === testProject.technicalChallenges[1].id.toString(),
+    // Filter out edges that connect to add model nodes
+    const firstChallengeModelEdges = edges.filter(
+      (edge) =>
+        edge.source === testProject.technicalChallenges[0].id.toString() && !edge.target.startsWith('add-model-to-'),
     )
 
-    expect(secondChallengeEdges.length).toBe(1) // Second challenge has 1 model
+    expect(firstChallengeModelEdges.length).toBe(2) // First challenge has 2 models
+
+    // Same for second challenge
+    const secondChallengeModelEdges = edges.filter(
+      (edge) =>
+        edge.source === testProject.technicalChallenges[1].id.toString() && !edge.target.startsWith('add-model-to-'),
+    )
+
+    expect(secondChallengeModelEdges.length).toBe(1) // Second challenge has 1 model
   })
 
   it('should position biological models with proper vertical spacing', () => {
@@ -150,5 +155,53 @@ describe('useProjectFlow', () => {
     )
 
     expect(firstChallengeModels[1].position.y - firstChallengeModels[0].position.y).toBe(MODEL_SPACING)
+  })
+
+  it('should create "add biological model" nodes for each technical challenge', () => {
+    const { result } = renderHook(() => useProjectFlow(testProject))
+    const [nodes, edges] = result.current
+
+    const addModelNodes = nodes.filter((node) => node.type === 'addBiologicalModel')
+
+    // Should have one add node per technical challenge
+    expect(addModelNodes.length).toBe(testProject.technicalChallenges.length)
+
+    // Check properties of add nodes
+    addModelNodes.forEach((node, index) => {
+      const challengeId = testProject.technicalChallenges[index].id
+
+      // Check node properties
+      expect(node.id).toBe(`add-model-to-${challengeId}`)
+      expect(node.data.id).toBe(challengeId)
+      expect((node.data as AddBiologicalModelData).challengeId).toBe(challengeId)
+      expect(node.position.x).toBe(BIOLOGICAL_MODEL_COLUMN)
+      expect(node.targetPosition).toBe(Position.Left)
+
+      // Check that there's an edge from the challenge to the add node
+      const edgeToAddNode = edges.find((edge) => edge.source === challengeId.toString() && edge.target === node.id)
+      expect(edgeToAddNode).toBeDefined()
+    })
+  })
+
+  it('should position add model nodes after the last biological model of each challenge', () => {
+    const { result } = renderHook(() => useProjectFlow(testProject))
+    const [nodes] = result.current
+
+    // For the first challenge with 2 models
+    const firstChallengeModels = nodes.filter(
+      (node) =>
+        node.type === 'biologicalModel' &&
+        testProject.technicalChallenges[0].biologicalModels.some((model) => model.id.toString() === node.id),
+    )
+
+    const firstChallengeAddNode = nodes.find(
+      (node) =>
+        node.type === 'addBiologicalModel' &&
+        (node.data as AddBiologicalModelData).challengeId === testProject.technicalChallenges[0].id,
+    )
+
+    // The add node should be positioned after the last model
+    const lastModelY = Math.max(...firstChallengeModels.map((node) => node.position.y))
+    expect(firstChallengeAddNode?.position.y).toBe(lastModelY + MODEL_SPACING)
   })
 })

@@ -1,6 +1,8 @@
 # AsteriaTest
 
-Technical test intended to showcase projects, their technical challenges and their biological models
+Technical test intended to showcase projects, their technical challenges and their biological models.
+
+Powered by Vite, React, Tailwind CSS and [React Flow](https://reactflow.dev/).
 
 ## Requirements
 

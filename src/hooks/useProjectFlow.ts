@@ -20,7 +20,7 @@ export const MODEL_SPACING = 120
 export function useProjectFlow(project?: Project) {
   return useMemo<[AsteriaNode[], Edge[]]>(() => {
     if (!project) return [[], []]
-    const projectNode: AsteriaNode = {
+    const projectNode: AsteriaNode<'project'> = {
       id: project.id.toString(),
       type: 'project',
       data: { id: project.id, label: project?.name },
@@ -30,8 +30,9 @@ export function useProjectFlow(project?: Project) {
     }
 
     let currentY = 0
-    const technicalChallenges: AsteriaNode[] = []
-    const biologicalModels: AsteriaNode[] = []
+    const technicalChallenges: AsteriaNode<'technicalChallenge'>[] = []
+    const biologicalModels: AsteriaNode<'biologicalModel'>[] = []
+    const addModelNodes: AsteriaNode<'addBiologicalModel'>[] = []
     const edges: Edge[] = []
 
     project.technicalChallenges?.forEach((challenge) => {
@@ -78,10 +79,39 @@ export function useProjectFlow(project?: Project) {
         })
         modelY += MODEL_SPACING
       })
-      currentY += Math.max(MODEL_SPACING, challenge.biologicalModels.length * MODEL_SPACING)
+
+      // Add the "Add Biological Model" node at the end of each challenge's models
+      const addModelNodeId = `add-model-to-${challenge.id}`
+      addModelNodes.push({
+        id: addModelNodeId,
+        type: 'addBiologicalModel',
+        data: {
+          id: challenge.id,
+          label: 'Add Biological Model',
+          challengeId: challenge.id,
+        },
+        position: { x: BIOLOGICAL_MODEL_COLUMN, y: modelY },
+        targetPosition: Position.Left,
+        draggable: true,
+      })
+
+      edges.push({
+        id: `challenge-${challenge.id}-add-model`,
+        source: challenge.id.toString(),
+        target: addModelNodeId,
+        animated: true,
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+        },
+      })
+
+      // Increment Y position to account for the add node
+      modelY += MODEL_SPACING
+
+      currentY += Math.max(MODEL_SPACING, (challenge.biologicalModels.length + 1) * MODEL_SPACING)
     })
 
-    const nodes = [projectNode, ...technicalChallenges, ...biologicalModels]
+    const nodes = [projectNode, ...technicalChallenges, ...biologicalModels, ...addModelNodes]
     return [nodes, edges]
   }, [project])
 }
